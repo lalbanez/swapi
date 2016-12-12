@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</h:head>
+<h:body>
+
+
+	<p:ajaxStatus onstart="PF('statusDialog').show()"
+		onsuccess="PF('statusDialog').hide()" />
+
+	<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+		closable="false" resizable="false" showHeader="false">
+		<p:graphicImage library="images" name="hourglass.gif" />
+	</p:dialog>
+
+	<h:form id="form">
+		<p:growl autoUpdate="true" for="aviso"/>
+
+		<p:fieldset legend="Escolher Nave" toggleable="true" toggleSpeed="500" collapsed="true">
+			<p:dataTable id="starships" var="starship"
+				value="#{cadastroController.starships}" style="width:100%"
+				selection="#{cadastroController.starshipChoised}"
+				rowKey="#{starship.name}" rowIndexVar="index" rows="10"
+				paginator="true" paginatorPosition="bottom">
+				<f:facet name="header">
+    	        Starship
+	        </f:facet>
+
+
+				<p:ajax event="rowSelectRadio"
+					listener="#{cadastroController.carregaPlanet}" update="@form" />
+				<p:column selectionMode="single"
+					rendered="#{starship.passengers != '0' and starship.passengers != 'unknown'}"
+					style="width:16px;text-align:center" />
+
+				<p:column
+					rendered="#{starship.passengers == '0' || starship.passengers == 'unknown'}"
+					style="width:16px;text-align:center" />
+				<p:column style="width:16px;text-align:center">
+					<p:commandLink update=":form:starshipDetail"
+						oncomplete="PF('starshipDialog').show()"
+						styleClass="ui-icon ui-icon-search">
+						<f:setPropertyActionListener value="#{starship}"
+							target="#{cadastroController.selectedStarship}" />
+					</p:commandLink>
+				</p:column>
+				<p:column headerText="Name">
+					<h:outputText value="#{starship.name}" />
+				</p:column>
+			</p:dataTable>
+		</p:fieldset>
+
+		<p:fieldset id="fsPlanet" legend="Escolher Planeta Destino"
+			rendered="#{not empty cadastroController.planets}" toggleable="true"
+			toggleSpeed="500" collapsed="true">
+			<p:dataTable id="planets" var="planet"
+				value="#{cadastroController.planets}" style="width:100%;"
+				selection="#{cadastroController.planetChoised}"
+				rowKey="#{planet.name}" rowIndexVar="index" rows="10"
+				paginator="true" paginatorPosition="bottom">
+				<f:facet name="header">
+    	        Planet
+	        </f:facet>
+
+				<p:ajax event="rowSelectRadio"
+					listener="#{cadastroController.carregaPeople}" update="@form" />
+				<p:column selectionMode="single"
+					style="width:16px;text-align:center" />
+				<p:column style="width:16px;text-align:center">
+					<p:commandLink update=":form:planetDetail"
+						oncomplete="PF('planetDialog').show()"
+						styleClass="ui-icon ui-icon-search">
+						<f:setPropertyActionListener value="#{planet}"
+							target="#{cadastroController.planetSelected}" />
+					</p:commandLink>
+				</p:column>
+				<p:column headerText="Name">
+					<h:outputText value="#{planet.name}" />
+				</p:column>
+			</p:dataTable>
+		</p:fieldset>
+
+
+		<p:fieldset id="fsPeoples" legend="Incluir Passageiros" 
+			rendered="#{not empty cadastroController.peoples}" toggleable="true"
+			toggleSpeed="500" collapsed="true">
+			<p:dataTable id="peoples" var="people"
+				value="#{cadastroController.peoples}" style="width:100%;"
+				selection="#{cadastroController.peopleChoised}"
+				rowKey="#{people.name}" rowIndexVar="index" rows="10"
+				paginator="true" paginatorPosition="bottom">
+				<f:facet name="header">
+    	        People
+	        	</f:facet>
+				<p:column selectionMode="multiple"
+					style="width:16px;text-align:center" />
+				<p:column headerText="Name">
+					<h:outputText value="#{people.name}" />
+				</p:column>
+				<p:column headerText="Gender">
+					<h:outputText value="#{people.gender}" />
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+
+		<p:commandButton rendered="#{not empty cadastroController.peoples}" value="Submit" action="#{cadastroController.submit}" />
+		<p:button value="Voltar"  outcome="index"/>
+
+
+		<p:dialog header="Starship Detail" widgetVar="starshipDialog"
+			modal="true" showEffect="blind" hideEffect="fade" resizable="false">
+			<p:outputPanel id="starshipDetail" style="text-align:center;">
+				<p:panelGrid columns="2" columnClasses="label,value">
+
+					<h:outputText value="Name" />
+					<h:outputText value="#{cadastroController.selectedStarship.name}" />
+
+					<h:outputText value="Model" />
+					<h:outputText value="#{cadastroController.selectedStarship.model}" />
+
+					<h:outputText value="Passenger:" />
+					<h:outputText
+						value="#{cadastroController.selectedStarship.passengers}" />
+
+				</p:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+		<p:dialog header="Planet Detail" widgetVar="planetDialog" modal="true"
+			showEffect="blind" hideEffect="fade" resizable="false">
+			<p:outputPanel id="planetDetail" style="text-align:center;">
+				<p:panelGrid columns="2" columnClasses="label,value">
+
+					<h:outputText value="Name" />
+					<h:outputText value="#{cadastroController.planetSelected.name}" />
+
+					<h:outputText value="Diameter" />
+					<h:outputText value="#{cadastroController.planetSelected.diameter}" />
+
+					<h:outputText value="Climate:" />
+					<h:outputText value="#{cadastroController.planetSelected.climate}" />
+
+					<h:outputText value="Terrain:" />
+					<h:outputText value="#{cadastroController.planetSelected.terrain}" />
+
+					<h:outputText value="Population:" />
+					<h:outputText
+						value="#{cadastroController.planetSelected.population}" />
+
+				</p:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+	</h:form>
+
+
+
+</h:body>
+</html>

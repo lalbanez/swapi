@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</h:head>
+
+<h:body>
+	<h:form id="frm">
+		<p:growl id="messages" />
+
+		<p:panelGrid columns="1" style="width: 100%">
+			<f:facet name="header">
+				Resumo de Rotas
+		</f:facet>
+			<p:dataTable id="traficList"
+				rendered="#{not empty cadastroController.mainList}"
+				value="#{cadastroController.mainList}" var="trafic">
+				<p:column>
+					<f:facet name="header">
+						Nave
+					</f:facet>
+					<h:outputLabel value="#{trafic.starship.name}"></h:outputLabel>
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						Planeta
+					</f:facet>
+					<h:outputLabel value="#{trafic.planet.name}"></h:outputLabel>
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						Qtde. Tripulantes
+					</f:facet>
+					<p:commandLink update=":frm:peopleDetail"
+						oncomplete="PF('peopleDialog').show()" title="View Detail"
+						styleClass="ui-icon ui-icon-search"
+						style="float:left; margin-right: 20px">
+						<f:setPropertyActionListener value="#{trafic}"
+							target="#{cadastroController.traficSelected}" />
+					</p:commandLink>
+					<h:outputLabel value="#{trafic.size}" />
+				</p:column>
+				<p:column width="5%">
+					<p:commandButton update="@form" process="@this" title="Delete"
+						icon="ui-icon-trash"
+						actionListener="#{cadastroController.excluirLinha(trafic)}" />
+
+				</p:column>
+			</p:dataTable>
+
+			<f:facet name="footer">
+				<p:commandButton value="Incluir" ajax="false" icon="ui-icon-disk"
+					action="#{cadastroController.incluirVoo}" />
+			</f:facet>
+		</p:panelGrid>
+
+
+		<p:dialog header="People Detail" widgetVar="peopleDialog" modal="true"
+			showEffect="blind" hideEffect="fade" resizable="false" width="40%">
+			<p:outputPanel id="peopleDetail" style="text-align:center;">
+
+
+				<p:dataTable value="#{cadastroController.traficSelected.passengers}"
+					var="passenger" paginator="true" rows="10"
+					paginatorAlwaysVisible="false" paginatorPosition="bottom">
+					<p:column headerText="Name">
+						<h:outputLabel value="#{passenger.name}" />
+					</p:column>
+					<p:column headerText="Gender">
+						<h:outputLabel value="#{passenger.gender}" />
+					</p:column>
+				</p:dataTable>
+
+			</p:outputPanel>
+		</p:dialog>
+
+	</h:form>
+</h:body>
+
+</html>
